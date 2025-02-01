@@ -2,8 +2,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================
+   FlowForge AI - Enhanced Design System
+   ============================================ */
+
 @theme inline {
-  /* Tailwind CSS Variables customized with tambo colors */
+  /* Tailwind CSS Variables customized with FlowForge colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -22,123 +26,476 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Chart colors */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Tambo Specific Variables needed for tambo components */
+  /* Tambo Specific Variables */
   --color-container: var(--container);
   --color-backdrop: var(--backdrop);
   --color-muted-backdrop: var(--muted-backdrop);
+
+  /* FlowForge Brand Colors */
+  --color-flow-blue: var(--flow-blue);
+  --color-flow-purple: var(--flow-purple);
+  --color-flow-cyan: var(--flow-cyan);
+  --color-flow-green: var(--flow-green);
+  --color-flow-orange: var(--flow-orange);
+  --color-flow-pink: var(--flow-pink);
+
+  /* Glow colors */
+  --color-glow-blue: var(--glow-blue);
+  --color-glow-purple: var(--glow-purple);
+  --color-glow-green: var(--glow-green);
+  --color-glow-orange: var(--glow-orange);
+  --color-glow-cyan: var(--glow-cyan);
+
+  /* Glass colors */
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
 }
 
+/* ============================================
+   Light Mode Variables
+   ============================================ */
 :root {
-  /* Default Tailwind CSS Variables customized with tambo colors */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.14 0 285);
+  /* Base colors */
+  --background: oklch(0.99 0.002 260);
+  --foreground: oklch(0.13 0.02 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.14 0 285);
+  --card-foreground: oklch(0.13 0.02 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.14 0 285);
-  --primary: oklch(0.31 0.02 281);
+  --popover-foreground: oklch(0.13 0.02 260);
+
+  /* Primary - Blue gradient base */
+  --primary: oklch(0.55 0.22 260);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.54 0.027 261);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.92 0 260);
-  --muted-foreground: oklch(0.73 0.022 260);
-  --accent: oklch(0.97 0 286);
-  --accent-foreground: oklch(0.21 0 286);
-  --destructive: oklch(0.64 0.2 25);
-  --border: oklch(0.93 0 242);
-  --input: oklch(0.92 0 286);
-  --ring: oklch(0.14 0 285);
-  --chart-1: oklch(0.72 0.15 60);
-  --chart-2: oklch(0.62 0.2 6);
-  --chart-3: oklch(0.53 0.2 262);
-  --chart-4: oklch(0.7 0.13 165);
-  --chart-5: oklch(0.62 0.2 313);
 
-  /* Tambo Specific Variables needed for tambo components */
-  --container: oklch(0.98 0 247);
-  --backdrop: oklch(0.25 0.07 252 / 0.25);
-  --muted-backdrop: oklch(0.25 0.07 252 / 0.1);
-  --radius: 0.5rem;
-  --panel-left-width: 500px;
-  --panel-right-width: 500px;
-  --sidebar-width: 3rem;
+  /* Secondary - Purple */
+  --secondary: oklch(0.92 0.02 260);
+  --secondary-foreground: oklch(0.25 0.03 260);
+
+  /* Muted */
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.45 0.02 260);
+
+  /* Accent */
+  --accent: oklch(0.94 0.02 290);
+  --accent-foreground: oklch(0.25 0.03 290);
+
+  /* Destructive */
+  --destructive: oklch(0.58 0.22 25);
+
+  /* Borders & inputs */
+  --border: oklch(0.91 0.01 260);
+  --input: oklch(0.96 0.005 260);
+  --ring: oklch(0.55 0.22 260);
+
+  /* Chart colors - vibrant palette */
+  --chart-1: oklch(0.65 0.2 260);
+  --chart-2: oklch(0.6 0.2 330);
+  --chart-3: oklch(0.7 0.18 170);
+  --chart-4: oklch(0.7 0.18 60);
+  --chart-5: oklch(0.6 0.2 290);
+
+  /* Tambo Specific */
+  --container: oklch(0.98 0.005 260);
+  --backdrop: oklch(0.13 0.02 260 / 0.1);
+  --muted-backdrop: oklch(0.13 0.02 260 / 0.05);
+
+  /* FlowForge Brand Colors */
+  --flow-blue: oklch(0.6 0.2 250);
+  --flow-purple: oklch(0.55 0.22 290);
+  --flow-cyan: oklch(0.75 0.15 200);
+  --flow-green: oklch(0.7 0.2 160);
+  --flow-orange: oklch(0.7 0.18 60);
+  --flow-pink: oklch(0.65 0.2 350);
+
+  /* Glow colors (for shadows) */
+  --glow-blue: oklch(0.6 0.2 250 / 0.4);
+  --glow-purple: oklch(0.55 0.22 290 / 0.4);
+  --glow-green: oklch(0.7 0.2 160 / 0.4);
+  --glow-orange: oklch(0.7 0.18 60 / 0.4);
+  --glow-cyan: oklch(0.75 0.15 200 / 0.4);
+
+  /* Glass effect */
+  --glass: oklch(1 0 0 / 0.7);
+  --glass-border: oklch(1 0 0 / 0.2);
+
+  /* Layout */
+  --radius: 0.75rem;
+  --panel-left-width: 380px;
+  --panel-right-width: 420px;
+  --sidebar-width: 4rem;
+  --header-height: 4rem;
 }
 
+/* ============================================
+   Dark Mode Variables
+   ============================================ */
 .dark {
-  /* Dark Mode Tailwind CSS Variables customized with tambo colors */
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.72 0.15 60);
-  --chart-2: oklch(0.62 0.2 6);
-  --chart-3: oklch(0.53 0.2 262);
-  --chart-4: oklch(0.7 0.13 165);
-  --chart-5: oklch(0.62 0.2 313);
+  /* Base colors - deep space theme */
+  --background: oklch(0.12 0.02 260);
+  --foreground: oklch(0.95 0.01 260);
+  --card: oklch(0.16 0.02 260);
+  --card-foreground: oklch(0.95 0.01 260);
+  --popover: oklch(0.14 0.02 260);
+  --popover-foreground: oklch(0.95 0.01 260);
 
-  /* Tambo Specific Variables needed for tambo components */
-  --container: oklch(0.98 0 247);
-  --backdrop: oklch(0.25 0.07 252 / 0.25);
-  --muted-backdrop: oklch(0.25 0.07 252 / 0.1);
-  --radius: 0.5rem;
-  --panel-left-width: 500px;
-  --panel-right-width: 500px;
-  --sidebar-width: 3rem;
+  /* Primary - Bright blue */
+  --primary: oklch(0.7 0.2 250);
+  --primary-foreground: oklch(0.12 0.02 260);
+
+  /* Secondary */
+  --secondary: oklch(0.22 0.025 260);
+  --secondary-foreground: oklch(0.9 0.01 260);
+
+  /* Muted */
+  --muted: oklch(0.2 0.02 260);
+  --muted-foreground: oklch(0.6 0.02 260);
+
+  /* Accent */
+  --accent: oklch(0.25 0.04 290);
+  --accent-foreground: oklch(0.9 0.01 260);
+
+  /* Destructive */
+  --destructive: oklch(0.65 0.22 25);
+
+  /* Borders & inputs */
+  --border: oklch(0.25 0.02 260);
+  --input: oklch(0.2 0.02 260);
+  --ring: oklch(0.7 0.2 250);
+
+  /* Chart colors - neon palette for dark mode */
+  --chart-1: oklch(0.75 0.2 250);
+  --chart-2: oklch(0.7 0.22 330);
+  --chart-3: oklch(0.8 0.18 170);
+  --chart-4: oklch(0.8 0.18 60);
+  --chart-5: oklch(0.7 0.22 290);
+
+  /* Tambo Specific */
+  --container: oklch(0.16 0.02 260);
+  --backdrop: oklch(0 0 0 / 0.4);
+  --muted-backdrop: oklch(0 0 0 / 0.2);
+
+  /* FlowForge Brand Colors - brighter for dark mode */
+  --flow-blue: oklch(0.7 0.2 250);
+  --flow-purple: oklch(0.65 0.22 290);
+  --flow-cyan: oklch(0.8 0.15 200);
+  --flow-green: oklch(0.75 0.2 160);
+  --flow-orange: oklch(0.75 0.18 60);
+  --flow-pink: oklch(0.7 0.2 350);
+
+  /* Glow colors - more intense for dark mode */
+  --glow-blue: oklch(0.7 0.2 250 / 0.5);
+  --glow-purple: oklch(0.65 0.22 290 / 0.5);
+  --glow-green: oklch(0.75 0.2 160 / 0.5);
+  --glow-orange: oklch(0.75 0.18 60 / 0.5);
+  --glow-cyan: oklch(0.8 0.15 200 / 0.5);
+
+  /* Glass effect - darker glass */
+  --glass: oklch(0.16 0.02 260 / 0.8);
+  --glass-border: oklch(1 0 0 / 0.1);
 }
 
+/* ============================================
+   Base Styles
+   ============================================ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: Arial, Helvetica, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Better focus styles */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
   }
 }
 
-/*
-This is a custom animation for the interactable components.
-It's used to highlight the fields that have been updated.
-You can remove this if you don't want to use it.
-*/
+/* ============================================
+   Custom Utility Classes
+   ============================================ */
+@layer utilities {
+  /* Gradient backgrounds */
+  .bg-gradient-flow {
+    background: linear-gradient(135deg, var(--flow-blue), var(--flow-purple));
+  }
+
+  .bg-gradient-flow-subtle {
+    background: linear-gradient(135deg, var(--flow-blue) / 0.1, var(--flow-purple) / 0.1);
+  }
+
+  .bg-gradient-mesh {
+    background:
+      radial-gradient(at 40% 20%, var(--flow-blue) / 0.15 0px, transparent 50%),
+      radial-gradient(at 80% 0%, var(--flow-purple) / 0.15 0px, transparent 50%),
+      radial-gradient(at 0% 50%, var(--flow-cyan) / 0.1 0px, transparent 50%),
+      radial-gradient(at 80% 50%, var(--flow-pink) / 0.1 0px, transparent 50%),
+      radial-gradient(at 0% 100%, var(--flow-green) / 0.1 0px, transparent 50%);
+  }
+
+  /* Glass morphism */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-strong {
+    background: var(--glass);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Glow effects */
+  .glow-blue {
+    box-shadow: 0 0 20px var(--glow-blue), 0 0 40px var(--glow-blue) / 0.5;
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px var(--glow-purple), 0 0 40px var(--glow-purple) / 0.5;
+  }
+
+  .glow-green {
+    box-shadow: 0 0 20px var(--glow-green), 0 0 40px var(--glow-green) / 0.5;
+  }
+
+  .glow-orange {
+    box-shadow: 0 0 20px var(--glow-orange), 0 0 40px var(--glow-orange) / 0.5;
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px var(--glow-cyan), 0 0 40px var(--glow-cyan) / 0.5;
+  }
+
+  /* Subtle glow on hover */
+  .hover-glow-blue:hover {
+    box-shadow: 0 0 30px var(--glow-blue);
+    transition: box-shadow 0.3s ease;
+  }
+
+  /* Text gradients */
+  .text-gradient-flow {
+    background: linear-gradient(135deg, var(--flow-blue), var(--flow-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-shine {
+    background: linear-gradient(
+      120deg,
+      var(--flow-blue) 0%,
+      var(--flow-purple) 25%,
+      var(--flow-cyan) 50%,
+      var(--flow-purple) 75%,
+      var(--flow-blue) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+  }
+
+  /* Animated border gradient */
+  .border-gradient {
+    position: relative;
+    background: var(--card);
+    border-radius: var(--radius);
+  }
+
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--flow-blue), var(--flow-purple));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -12px var(--backdrop);
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hide scrollbar but allow scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+}
+
+/* ============================================
+   Keyframe Animations
+   ============================================ */
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
 
 @keyframes flash {
-  0%,
-  100% {
+  0%, 100% {
     background-color: transparent;
   }
   50% {
-    background-color: rgb(59 130 246 / 0.3);
+    background-color: var(--flow-blue) / 0.2;
   }
 }
 
-.animate-flash {
-  animation: flash 1s ease-in-out;
-}
-
-/*
-Animated gradient for thinking text, creates a shimmering effect that moves across the text.
-*/
 @keyframes thinking-gradient {
   0% {
     background-position: -200% center;
@@ -148,19 +505,177 @@ Animated gradient for thinking text, creates a shimmering effect that moves acro
   }
 }
 
+@keyframes flow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--glow-blue);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px var(--glow-blue) / 0;
+  }
+}
+
+@keyframes node-active {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--glow-blue), inset 0 0 0 0 var(--glow-blue);
+  }
+  50% {
+    box-shadow: 0 0 20px 5px var(--glow-blue), inset 0 0 20px 0 var(--glow-blue) / 0.2;
+  }
+}
+
+/* ============================================
+   Animation Classes
+   ============================================ */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.4s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animate-flash {
+  animation: flash 1s ease-in-out;
+}
+
 .animate-thinking-gradient {
-  /* Fallback */
-  background: linear-gradient(90deg, #666 0%, #bbb 50%, #666 100%);
-  /* Preferred (overrides when supported) */
   background: linear-gradient(
     90deg,
-    oklch(0.14 0 0) 0%,
-    oklch(0.7 0 0) 50%,
-    oklch(0.14 0 0) 100%
+    var(--muted-foreground) 0%,
+    var(--foreground) 50%,
+    var(--muted-foreground) 100%
   );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: thinking-gradient 2s linear infinite;
+}
+
+.animate-flow-pulse {
+  animation: flow-pulse 2s ease-in-out infinite;
+}
+
+.animate-node-active {
+  animation: node-active 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   Workflow Node Colors
+   ============================================ */
+.node-trigger {
+  --node-color: var(--flow-blue);
+  --node-glow: var(--glow-blue);
+}
+
+.node-action {
+  --node-color: var(--flow-green);
+  --node-glow: var(--glow-green);
+}
+
+.node-condition {
+  --node-color: var(--flow-purple);
+  --node-glow: var(--glow-purple);
+}
+
+.node-delay {
+  --node-color: var(--flow-orange);
+  --node-glow: var(--glow-orange);
+}
+
+.node-loop {
+  --node-color: var(--flow-cyan);
+  --node-glow: var(--glow-cyan);
+}
+
+/* ============================================
+   Grid Pattern Background
+   ============================================ */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-grid-lg {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-dots {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ============================================
+   Loading States
+   ============================================ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--muted-foreground) / 0.1 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================
+   Status Colors
+   ============================================ */
+.status-pending {
+  @apply text-muted-foreground bg-muted;
+}
+
+.status-running {
+  @apply text-flow-blue bg-flow-blue/10;
+}
+
+.status-success {
+  @apply text-flow-green bg-flow-green/10;
+}
+
+.status-error {
+  @apply text-destructive bg-destructive/10;
+}
+
+.status-warning {
+  @apply text-flow-orange bg-flow-orange/10;
 }
