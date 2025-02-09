@@ -1,14 +1,5 @@
-"use client";
-
-/**
- * Message Input Component
- *
- * This file re-exports from the modular message-input/ directory structure.
- * All implementation has been moved to separate files for better maintainability.
- */
-
 // Main component
-export { MessageInput } from "./message-input/MessageInput";
+export { MessageInput } from "./MessageInput";
 
 // Sub-components
 export {
@@ -26,10 +17,10 @@ export {
   // Images
   MessageInputStagedImages,
   MessageInputContexts,
-} from "./message-input/components";
+} from "./components";
 
 // Constants
-export { messageInputVariants } from "./message-input/constants";
+export { messageInputVariants } from "./constants";
 
 // Types
 export type {
@@ -44,7 +35,7 @@ export type {
   MessageInputMcpPromptButtonProps,
   MessageInputMcpResourceButtonProps,
   MessageInputStagedImagesProps,
-} from "./message-input/types";
+} from "./types";
 
 // Re-export types from text-editor for convenience
-export type { PromptItem, ResourceItem } from "./text-editor";
+export type { PromptItem, ResourceItem } from "../text-editor";
