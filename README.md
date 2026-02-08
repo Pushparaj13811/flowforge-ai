@@ -65,7 +65,7 @@ FlowForge AI combines the power of conversational AI (via [Tambo AI](https://tam
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Pushparaj13811/flowforge-ai.git
 cd flowforge-ai
 
 # Install dependencies
