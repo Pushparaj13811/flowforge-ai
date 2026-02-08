@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCopyToClipboard } from "@/hooks";
 
 interface ApiKeyCheckProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ const ApiKeyMissingAlert = () => (
   <div className="mb-4 p-6 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
     <p className="mb-3">To get started, you need to initialize Tambo:</p>
     <div className="flex items-center gap-2 bg-gray-100 p-3 rounded mb-3">
-      <code className="text-sm flex-grow">npx tambo init</code>
+      <code className="text-sm grow">npx tambo init</code>
       <CopyButton text="npx tambo init" />
     </div>
     <p className="text-sm">
@@ -30,21 +30,16 @@ const ApiKeyMissingAlert = () => (
 );
 
 const CopyButton = ({ text }: { text: string }) => {
-  const [showCopied, setShowCopied] = useState(false);
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(text);
-    setShowCopied(true);
-    setTimeout(() => setShowCopied(false), 2000);
-  };
+  const { copiedId, copyToClipboard } = useCopyToClipboard();
+  const isCopied = copiedId === "init-command";
 
   return (
     <button
-      onClick={copyToClipboard}
+      onClick={() => copyToClipboard(text, "init-command")}
       className="p-2 text-gray-600 hover:text-gray-900 bg-gray-100 rounded transition-colors relative group"
       title="Copy to clipboard"
     >
-      {showCopied ? (
+      {isCopied ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -75,7 +70,7 @@ const CopyButton = ({ text }: { text: string }) => {
         </svg>
       )}
       <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-        {showCopied ? "Copied!" : "Copy"}
+        {isCopied ? "Copied!" : "Copy"}
       </span>
     </button>
   );
@@ -86,7 +81,7 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
 
   return (
     <div className="flex items-start gap-4">
-      <div className="flex-grow">
+      <div className="grow">
         <div className="flex items-center gap-1">
           <div className="min-w-6">{isApiKeyMissing ? "❌" : "✅"}</div>
           <p>

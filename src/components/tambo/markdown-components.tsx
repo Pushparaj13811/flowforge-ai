@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useCopyToClipboard } from "@/hooks";
 import DOMPurify from "dompurify";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
@@ -73,47 +74,31 @@ const CodeHeader = ({
   language?: string;
   code?: string;
 }) => {
-  const [copied, setCopied] = React.useState(false);
-  const [error, setError] = React.useState(false);
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { status, copyToClipboard } = useCopyToClipboard();
 
-  const copyToClipboard = async () => {
-    if (!code) return;
-
-    // Clear any existing timeout to prevent race conditions
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+  const handleCopy = () => {
+    if (code) {
+      copyToClipboard(code, "code-block");
     }
-
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setError(false);
-    } catch (err) {
-      console.error("Failed to copy code to clipboard:", err);
-      setError(true);
-    }
-    timeoutRef.current = setTimeout(() => setError(false), 2000);
   };
 
   const Icon = React.useMemo(() => {
-    if (error) {
+    if (status === "error") {
       return <X className="size-4 text-red-500" />;
     }
-    if (copied) {
+    if (status === "copied") {
       return <Check className="size-4 text-green-500" />;
     }
     return <Copy className="size-4" />;
-  }, [copied, error]);
+  }, [status]);
 
   return (
     <div className="flex items-center justify-between gap-4 rounded-t-md bg-container px-4 py-2 text-sm font-semibold text-foreground">
       <span className="lowercase text-muted-foreground">{language}</span>
       <button
-        onClick={copyToClipboard}
+        onClick={handleCopy}
         className="p-1 rounded-md hover:bg-backdrop transition-colors cursor-pointer"
-        title={error ? "Failed to copy" : "Copy code"}
+        title={status === "error" ? "Failed to copy" : "Copy code"}
       >
         {Icon}
       </button>
