@@ -2,7 +2,7 @@
 
 import { withInteractable } from "@tambo-ai/react";
 import { useEffect, useRef, useState } from "react";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Link2,
@@ -44,8 +44,8 @@ export const integrationPromptSchema = z.object({
   title: z.string().default("Required Integrations").describe("Title of the prompt"),
   description: z.string().optional().describe("Description explaining what's needed"),
   integrations: z.array(requiredIntegrationSchema).default([]).describe("List of required integrations"),
-  onConnect: z.function().args(z.string()).returns(z.void()).optional().describe("Callback when connect is clicked"),
-  onSelect: z.function().args(z.string(), z.string()).returns(z.void()).optional().describe("Callback when an account is selected"),
+  // Note: Callbacks are handled internally via window events, not passed through AI
+  // onConnect and onSelect are available on the component but not in the AI schema
   showRefresh: z.boolean().default(true).describe("Whether to show refresh button"),
   workflowContext: z.string().optional().describe("Context about what workflow needs these integrations"),
 });
@@ -116,7 +116,10 @@ function getIntegrationStyle(type: string): { icon: string; color: string; bgCol
  * Base IntegrationPrompt component
  */
 function IntegrationPromptBase(props: IntegrationPromptProps) {
-  const [config, setConfig] = useState<IntegrationPromptProps>(props);
+  const [config, setConfig] = useState<IntegrationPromptProps>({
+    ...props,
+    integrations: props.integrations ?? [],
+  });
   const [updatedIntegrations, setUpdatedIntegrations] = useState<Set<string>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const prevPropsRef = useRef<IntegrationPromptProps>(props);
@@ -157,9 +160,10 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
   const handleConnect = (type: string) => {
     // Open settings in a new tab or trigger navigation
     if (typeof window !== 'undefined') {
-      window.open('/app/settings/integrations', '_blank');
+      window.open('/app/settings?section=integrations', '_blank');
+      // Dispatch event for any listeners
+      window.dispatchEvent(new CustomEvent('integration-connect', { detail: { type } }));
     }
-    config.onConnect?.(type);
   };
 
   const handleSelect = (type: string, id: string) => {
@@ -169,7 +173,10 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
         i.type === type ? { ...i, selectedId: id } : i
       ),
     }));
-    config.onSelect?.(type, id);
+    // Dispatch event for any listeners
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('integration-select', { detail: { type, id } }));
+    }
   };
 
   const handleRefresh = async () => {
@@ -182,8 +189,9 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  const allConnected = config.integrations.every((i) => i.isConnected || i.hasPlatformFallback);
-  const connectedCount = config.integrations.filter((i) => i.isConnected || i.hasPlatformFallback).length;
+  const integrations = config.integrations ?? [];
+  const allConnected = integrations.every((i) => i.isConnected || i.hasPlatformFallback);
+  const connectedCount = integrations.filter((i) => i.isConnected || i.hasPlatformFallback).length;
 
   return (
     <motion.div
@@ -235,13 +243,13 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
       {/* Progress Indicator */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-          <span>{connectedCount} of {config.integrations.length} connected</span>
-          <span>{Math.round((connectedCount / config.integrations.length) * 100)}%</span>
+          <span>{connectedCount} of {integrations.length} connected</span>
+          <span>{integrations.length > 0 ? Math.round((connectedCount / integrations.length) * 100) : 0}%</span>
         </div>
         <div className="h-2 bg-muted rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${(connectedCount / config.integrations.length) * 100}%` }}
+            animate={{ width: `${integrations.length > 0 ? (connectedCount / integrations.length) * 100 : 0}%` }}
             className={cn(
               "h-full rounded-full transition-all duration-500",
               allConnected ? "bg-flow-green" : "bg-flow-blue"
@@ -253,7 +261,7 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
       {/* Integration List */}
       <div className="space-y-3">
         <AnimatePresence>
-          {config.integrations.map((integration, index) => {
+          {integrations.map((integration, index) => {
             const style = getIntegrationStyle(integration.type);
             const isUpdated = updatedIntegrations.has(integration.type);
             const hasMultiple = (integration.options?.length || 0) > 1;
@@ -355,7 +363,7 @@ function IntegrationPromptBase(props: IntegrationPromptProps) {
             )}
           </div>
           <a
-            href="/app/settings/integrations"
+            href="/app/settings?section=integrations"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 hover:text-foreground transition-colors"

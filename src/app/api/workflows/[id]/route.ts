@@ -4,27 +4,20 @@ import { eq, and, or } from "drizzle-orm";
 import { getCurrentUser, getAnonymousId } from "@/lib/auth/utils";
 import { z } from "zod";
 
-// Node position schema
-const positionSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-}).default({ x: 100, y: 50 });
-
-// Node schema with proper validation
+// Accept any node format - both flat (type:"trigger") and React Flow (type:"default", data:{nodeType:"trigger"})
 const nodeSchema = z.object({
   id: z.string(),
-  type: z.enum(["trigger", "action", "condition", "delay", "loop"]),
-  label: z.string(),
+  type: z.string(), // "trigger", "action", "default", "custom", etc.
+  position: z.object({ x: z.number(), y: z.number() }).optional().default({ x: 100, y: 50 }),
+  // Flat format fields
+  label: z.string().optional(),
   description: z.string().optional(),
   icon: z.string().optional(),
-  status: z.enum(["idle", "running", "success", "error", "pending"]).optional(),
-  position: positionSchema.optional().default({ x: 100, y: 50 }),
-  // Action-specific configuration
+  status: z.string().optional(),
   config: z.record(z.any()).optional(),
-}).transform((node) => ({
-  ...node,
-  position: node.position ?? { x: 100, y: 50 },
-}));
+  // React Flow nested data format
+  data: z.record(z.any()).optional(),
+}).passthrough(); // Allow additional fields
 
 // Edge schema
 const edgeSchema = z.object({
@@ -34,7 +27,7 @@ const edgeSchema = z.object({
   sourceHandle: z.string().optional(),
   targetHandle: z.string().optional(),
   label: z.string().optional(),
-});
+}).passthrough(); // Allow animated, type, etc.
 
 // Schema for updating a workflow
 const updateWorkflowSchema = z.object({

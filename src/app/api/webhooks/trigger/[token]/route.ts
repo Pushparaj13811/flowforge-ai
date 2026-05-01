@@ -37,24 +37,20 @@ export async function POST(
     const { token } = await params;
 
     // ========================================================================
-    // API KEY VALIDATION: Required for all programmatic webhook triggers
+    // API KEY VALIDATION: Optional - checked if provided, but not required
+    // The webhook auth method (bearer/hmac/url_token) is the primary security
     // ========================================================================
+    let apiKeyValidation: { valid: boolean; keyId?: string; userId?: string; error?: string } = { valid: true };
     const apiKey = extractApiKeyFromRequest(req);
 
-    if (!apiKey) {
-      return createErrorResponse(
-        'API key required. Provide via Authorization: Bearer ff_xxx or X-API-Key: ff_xxx header',
-        401
-      );
-    }
-
-    const apiKeyValidation = await validateApiKey(apiKey, 'workflow:trigger');
-
-    if (!apiKeyValidation.valid) {
-      return createErrorResponse(
-        apiKeyValidation.error || 'Invalid API key',
-        401
-      );
+    if (apiKey) {
+      apiKeyValidation = await validateApiKey(apiKey, 'workflow:trigger');
+      if (!apiKeyValidation.valid) {
+        return createErrorResponse(
+          apiKeyValidation.error || 'Invalid API key',
+          401
+        );
+      }
     }
 
     // Find webhook trigger by token
@@ -73,9 +69,9 @@ export async function POST(
       return createErrorResponse('Webhook is inactive', 403);
     }
 
-    // Check if workflow is active
-    if (trigger.workflow.status !== 'active') {
-      return createErrorResponse('Workflow is not active', 400);
+    // Check if workflow is not paused
+    if (trigger.workflow.status === 'paused') {
+      return createErrorResponse('Workflow is paused', 400);
     }
 
     // Parse request body
@@ -99,18 +95,20 @@ export async function POST(
     }
 
     // ========================================================================
-    // AUTHENTICATION: Enforce the selected auth method only
+    // AUTHENTICATION: Bearer token or HMAC signature required
+    // URL token is only used for routing (finding the trigger), NOT for auth
     // ========================================================================
 
-    const selectedAuthMethod = trigger.authMethod || 'url_token';
+    const selectedAuthMethod = trigger.authMethod || 'bearer';
 
-    // Validate based on the selected authentication method
     switch (selectedAuthMethod) {
       case 'bearer': {
-        // Bearer token authentication required
         const authHeader = req.headers.get('authorization');
         if (!authHeader) {
-          return createErrorResponse('Authorization header required for bearer token authentication', 401);
+          return createErrorResponse(
+            'Authorization header required. Send: Authorization: Bearer <your_token>',
+            401
+          );
         }
         const bearerToken = authHeader.replace(/^Bearer\s+/i, '');
         if (!trigger.bearerToken || bearerToken !== trigger.bearerToken) {
@@ -120,10 +118,12 @@ export async function POST(
       }
 
       case 'hmac': {
-        // HMAC signature authentication required
         const signature = req.headers.get('x-webhook-signature');
         if (!signature) {
-          return createErrorResponse('x-webhook-signature header required for HMAC authentication', 401);
+          return createErrorResponse(
+            'x-webhook-signature header required. Sign the request body with your HMAC secret.',
+            401
+          );
         }
         if (!trigger.hmacSecret) {
           return createErrorResponse('HMAC secret not configured for this webhook', 500);
@@ -135,12 +135,12 @@ export async function POST(
         break;
       }
 
-      case 'url_token':
       default: {
-        // URL token authentication - the token in the URL is the authentication
-        // Since we already found the trigger by token, this is authenticated
-        console.log(`[Webhook Security] URL token auth used for trigger ${trigger.id}`);
-        break;
+        // No url_token fallback - always require proper auth
+        return createErrorResponse(
+          'Invalid auth method configured. Please update webhook to use bearer or hmac.',
+          401
+        );
       }
     }
 

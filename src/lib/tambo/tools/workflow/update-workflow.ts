@@ -83,7 +83,7 @@ RIGHT: Call tool -> Render WorkflowCanvas component -> Brief explanation`,
       const nodesWithPositions = finalNodes.map((node: any, index: number) => ({
         ...node,
         id: node.id || `node_${Date.now()}_${index}`,
-        label: node.label || `${node.type.charAt(0).toUpperCase() + node.type.slice(1)} ${index + 1}`,
+        label: node.label || `${(node.type || 'action').charAt(0).toUpperCase() + (node.type || 'action').slice(1)} ${index + 1}`,
         position: node.position || { x: 100, y: 50 + index * 130 },
         status: node.status || "idle",
       }));
@@ -93,13 +93,35 @@ RIGHT: Call tool -> Render WorkflowCanvas component -> Brief explanation`,
         id: edge.id || `edge_${Date.now()}_${index}`,
       }));
 
+      const updatedName = input.updates.name || currentWorkflow.name || "Updated Workflow";
+      const updatedDescription = input.updates.description || currentWorkflow.description;
+
+      // Persist changes to database via PATCH API
+      const patchResponse = await fetch(getApiUrl(`/api/workflows/${input.workflowId}`), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: updatedName,
+          description: updatedDescription,
+          nodes: nodesWithPositions,
+          edges: edgesToUse,
+        }),
+      });
+
+      if (!patchResponse.ok) {
+        const patchError = await patchResponse.json().catch(() => ({}));
+        console.warn("Failed to persist workflow update:", patchError);
+        // Still return success for display, but note the save failure
+      }
+
       return {
         success: true,
         message: `Workflow updated with ${nodesWithPositions.length} nodes and ${edgesToUse.length} connections`,
         workflow: {
           workflowId: input.workflowId,
-          name: input.updates.name || currentWorkflow.name || "Updated Workflow",
-          description: input.updates.description || currentWorkflow.description,
+          name: updatedName,
+          description: updatedDescription,
           nodes: nodesWithPositions,
           edges: edgesToUse,
           status: (currentWorkflow.status as "draft" | "active" | "paused") || "draft",

@@ -3,7 +3,7 @@
  * @description Shared validation schemas and types for workflows
  */
 
-import { z } from "zod";
+import { z } from "zod/v3";
 
 // ============================================================================
 // Node Types

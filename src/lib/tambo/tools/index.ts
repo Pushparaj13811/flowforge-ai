@@ -1,8 +1,5 @@
 import type { TamboTool } from "@tambo-ai/react";
 
-// Population stats tools
-import { populationStatsTool, globalPopulationTool } from "./population-stats";
-
 // Data tools
 import { transformDataTool, delayTool, evaluateConditionTool } from "./data-tools";
 
@@ -41,10 +38,6 @@ import {
  * The tools can be controlled by AI to dynamically fetch data based on user interactions.
  */
 export const tools: TamboTool[] = [
-  // Population stats tools
-  populationStatsTool,
-  globalPopulationTool,
-
   // Core Workflow tools
   createWorkflowTool,
   executeWorkflowTool,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Copy } from "lucide-react";
+import { Loader2, Copy, Shield, KeyRound, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCopyToClipboard } from "@/hooks";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export function TriggerConfig({ config, onChange, icon }: TriggerConfigProps) {
   const {
     isGenerating,
     triggerData,
+    isWorkflowSaved,
     handleGenerateWebhook,
     handleAuthMethodChange,
     handleCopyWebhook,
@@ -37,72 +38,81 @@ export function TriggerConfig({ config, onChange, icon }: TriggerConfigProps) {
     return <ScheduleTriggerConfig config={config} onChange={onChange} />;
   }
 
-  const authMethod = (config.authMethod as string) || "url_token";
+  // Default to bearer (never url_token)
+  const authMethod = (config.authMethod as string) || "bearer";
 
   // Default webhook trigger
   return (
     <>
-      <FormField label="Webhook URL" hint="Send POST requests to this URL to trigger workflow">
+      {/* Webhook URL Section */}
+      <FormField label="Webhook Endpoint" hint="External services send POST requests here to trigger this workflow">
         <div className="flex flex-col gap-2">
-          {triggerData?.webhookUrl ? (
+          {!isWorkflowSaved ? (
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                Save workflow first
+              </p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                The workflow must be saved before generating a webhook endpoint.
+              </p>
+            </div>
+          ) : triggerData?.webhookUrl ? (
             <>
-              <Input
-                value={triggerData.webhookUrl}
-                readOnly
-                className="h-8 text-sm bg-muted font-mono text-xs"
-              />
-              <div className="flex gap-2">
+              <div className="relative">
+                <Input
+                  value={triggerData.webhookUrl}
+                  readOnly
+                  className="h-9 text-sm bg-muted/50 font-mono text-xs pr-20"
+                />
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="h-8 flex-1"
+                  className="absolute right-1 top-1 h-7 text-xs"
                   onClick={handleCopyWebhook}
                 >
-                  <Copy className="h-3.5 w-3.5 mr-1.5" />
-                  Copy URL
+                  <Copy className="h-3 w-3 mr-1" />
+                  Copy
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 flex-1"
-                  onClick={handleGenerateWebhook}
-                  disabled={isGenerating}
-                >
-                  Regenerate
-                </Button>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                <Shield className="h-3.5 w-3.5" />
+                <span>Secured with {authMethod === "hmac" ? "HMAC signature" : "Bearer token"} authentication</span>
               </div>
             </>
           ) : (
             <Button
               variant="default"
               size="sm"
-              className="h-8"
+              className="h-9"
               onClick={handleGenerateWebhook}
               disabled={isGenerating}
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Generating...
                 </>
               ) : (
-                "Generate Webhook URL"
+                <>
+                  <KeyRound className="h-4 w-4 mr-2" />
+                  Generate Webhook URL
+                </>
               )}
             </Button>
           )}
         </div>
       </FormField>
 
-      {/* Authentication Method Selector */}
+      {/* Authentication Method - Only Bearer and HMAC */}
       {triggerData && (
-        <FormField label="Authentication Method" hint="How to secure your webhook">
+        <FormField label="Authentication" hint="All webhooks require authentication to prevent unauthorized access">
           <div className="space-y-2">
-            {/* Bearer Token Option */}
+            {/* Bearer Token */}
             <label className={cn(
-              "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+              "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
               authMethod === "bearer"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
+                ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm"
+                : "border-border hover:border-muted-foreground/30"
             )}>
               <input
                 type="radio"
@@ -110,60 +120,66 @@ export function TriggerConfig({ config, onChange, icon }: TriggerConfigProps) {
                 value="bearer"
                 checked={authMethod === "bearer"}
                 onChange={(e) => handleAuthMethodChange(e.target.value)}
-                className="mt-1"
+                className="mt-0.5 accent-emerald-600"
               />
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
+                  <KeyRound className="h-4 w-4 text-emerald-600" />
                   <span className="font-medium text-sm">Bearer Token</span>
-                  <span className="text-xs px-1.5 py-0.5 bg-green-500/10 text-green-600 rounded">Most Secure</span>
+                  <span className="text-[10px] px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 rounded font-medium">Recommended</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Add token in Authorization header
+                <p className="text-xs text-muted-foreground mt-1">
+                  Simple and secure. Include token in the Authorization header.
                 </p>
                 {authMethod === "bearer" && triggerData.bearerToken && (
-                  <div className="mt-2 space-y-2">
-                    <div className="flex gap-2">
+                  <div className="mt-3 space-y-2">
+                    <div className="flex gap-1.5">
                       <Input
                         value={triggerData.bearerToken}
                         readOnly
-                        className="h-7 text-[10px] bg-green-50 dark:bg-green-950/30 font-mono border-green-200 dark:border-green-800"
+                        className="h-7 text-[11px] bg-emerald-50 dark:bg-emerald-950/30 font-mono border-emerald-200 dark:border-emerald-800 flex-1 min-w-0"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-7 shrink-0"
+                        className="h-7 shrink-0 text-xs"
                         onClick={handleCopyToken}
                       >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                    <code className="block text-xs font-mono bg-muted p-2 rounded break-all">
-                      Authorization: Bearer {triggerData.bearerToken}
-                    </code>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 text-[10px] w-full"
-                      onClick={async () => {
-                        const success = await copyToClipboard(`Authorization: Bearer ${triggerData.bearerToken}`, "header");
-                        if (success) alert("Header copied!");
-                      }}
-                    >
-                      Copy Header
-                    </Button>
+                    <div className="relative">
+                      <code className="block text-[11px] font-mono bg-zinc-900 text-emerald-400 p-3 rounded-md break-all whitespace-pre-wrap leading-relaxed">
+{`curl -X POST "${triggerData.webhookUrl}" \\
+  -H "Authorization: Bearer ${triggerData.bearerToken}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name": "John", "email": "john@example.com"}'`}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-1.5 right-1.5 h-6 text-[10px] text-zinc-400 hover:text-white"
+                        onClick={async () => {
+                          await copyToClipboard(`curl -X POST "${triggerData.webhookUrl}" -H "Authorization: Bearer ${triggerData.bearerToken}" -H "Content-Type: application/json" -d '{"name": "John", "email": "john@example.com"}'`, "curl-bearer");
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
             </label>
 
-            {/* HMAC Signature Option */}
+            {/* HMAC Signature */}
             <label className={cn(
-              "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+              "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
               authMethod === "hmac"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
+                ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 shadow-sm"
+                : "border-border hover:border-muted-foreground/30"
             )}>
               <input
                 type="radio"
@@ -171,82 +187,54 @@ export function TriggerConfig({ config, onChange, icon }: TriggerConfigProps) {
                 value="hmac"
                 checked={authMethod === "hmac"}
                 onChange={(e) => handleAuthMethodChange(e.target.value)}
-                className="mt-1"
+                className="mt-0.5 accent-blue-600"
               />
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-blue-600" />
                   <span className="font-medium text-sm">HMAC Signature</span>
-                  <span className="text-xs px-1.5 py-0.5 bg-blue-500/10 text-blue-600 rounded">Recommended</span>
+                  <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded font-medium">Advanced</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Sign payload with secret and add X-Webhook-Signature header
+                <p className="text-xs text-muted-foreground mt-1">
+                  Cryptographically sign each request to verify payload integrity.
                 </p>
                 {authMethod === "hmac" && triggerData.hmacSecret && (
-                  <div className="mt-2 space-y-2">
-                    <div className="flex gap-2">
-                      <Input
-                        value={triggerData.hmacSecret}
-                        readOnly
-                        className="h-7 text-[10px] bg-blue-50 dark:bg-blue-950/30 font-mono border-blue-200 dark:border-blue-800"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-7 shrink-0"
-                        onClick={handleCopyToken}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
+                  <div className="mt-3 space-y-2">
+                    <div>
+                      <p className="text-[11px] font-medium text-blue-700 dark:text-blue-300 mb-1">Signing Secret</p>
+                      <div className="flex gap-1.5">
+                        <Input
+                          value={triggerData.hmacSecret}
+                          readOnly
+                          className="h-7 text-[11px] bg-blue-50 dark:bg-blue-950/30 font-mono border-blue-200 dark:border-blue-800 flex-1 min-w-0"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7 shrink-0 text-xs"
+                          onClick={handleCopyToken}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                    <p className="text-[10px] text-blue-600 dark:text-blue-400">
-                      Use this secret to sign your request body
-                    </p>
-                    <code className="block text-xs font-mono bg-muted p-2 rounded break-all">
-                      X-Webhook-Signature: sha256=HMAC_SHA256(body, secret)
-                    </code>
-                    <div className="text-[10px] p-2 bg-blue-50 dark:bg-blue-950/30 rounded border border-blue-200 dark:border-blue-800">
-                      <p className="font-medium text-blue-700 dark:text-blue-300 mb-1">Node.js Example:</p>
-                      <pre className="text-blue-600 dark:text-blue-400 whitespace-pre-wrap">
-{`const crypto = require('crypto');
-const signature = crypto
-  .createHmac('sha256', '${triggerData.hmacSecret}')
-  .update(JSON.stringify(body))
-  .digest('hex');`}
-                      </pre>
+                    <div className="text-[11px] p-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-md border border-blue-200 dark:border-blue-800">
+                      <p className="font-medium text-blue-700 dark:text-blue-300 mb-1.5">How to sign:</p>
+                      <code className="block font-mono text-blue-600 dark:text-blue-400 whitespace-pre-wrap leading-relaxed">
+{`signature = HMAC_SHA256(request_body, secret)
+// Add header: X-Webhook-Signature: sha256=<signature>`}
+                      </code>
+                    </div>
+                    <div className="relative">
+                      <code className="block text-[11px] font-mono bg-zinc-900 text-blue-400 p-3 rounded-md break-all whitespace-pre-wrap leading-relaxed">
+{`curl -X POST "${triggerData.webhookUrl}" \\
+  -H "X-Webhook-Signature: sha256=<signature>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name": "John", "email": "john@example.com"}'`}
+                      </code>
                     </div>
                   </div>
-                )}
-              </div>
-            </label>
-
-            {/* URL Token Only Option */}
-            <label className={cn(
-              "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
-              authMethod === "url_token"
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
-            )}>
-              <input
-                type="radio"
-                name="authMethod"
-                value="url_token"
-                checked={authMethod === "url_token"}
-                onChange={(e) => handleAuthMethodChange(e.target.value)}
-                className="mt-1"
-              />
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">URL Token Only</span>
-                  <span className="text-xs px-1.5 py-0.5 bg-amber-500/10 text-amber-600 rounded">Basic</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Token is embedded in the URL (least secure, but simplest)
-                </p>
-                {authMethod === "url_token" && (
-                  <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-2">
-                    No extra authentication needed - the URL contains the token. Use for testing only.
-                  </p>
                 )}
               </div>
             </label>
@@ -258,81 +246,6 @@ const signature = crypto
       <div className="mt-4 pt-4 border-t border-border">
         <ExpectedDataFields config={config} onChange={onChange} />
       </div>
-
-      {/* Usage Instructions */}
-      {triggerData && (
-        <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md space-y-3">
-          <div>
-            <p className="font-medium mb-1">How to use:</p>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Copy the webhook URL above</li>
-              {authMethod === "bearer" && <li>Add the Bearer token to your Authorization header</li>}
-              {authMethod === "hmac" && <li>Sign your request body with the HMAC secret</li>}
-              <li>Send POST requests with JSON data to trigger this workflow</li>
-            </ol>
-          </div>
-
-          <div className="pt-2 border-t border-border">
-            <p className="font-medium mb-2">Example cURL Command:</p>
-            {authMethod === "bearer" && triggerData.bearerToken && (
-              <div className="relative">
-                <code className="block text-[10px] font-mono bg-muted p-2 rounded break-all whitespace-pre-wrap">
-{`curl -X POST "${triggerData.webhookUrl}" \\
-  -H "Authorization: Bearer ${triggerData.bearerToken}" \\
-  -H "Content-Type: application/json" \\
-  -d '{"name": "John", "email": "john@example.com"}'`}
-                </code>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-1 right-1 h-6 text-[10px]"
-                  onClick={async () => {
-                    const success = await copyToClipboard(`curl -X POST "${triggerData.webhookUrl}" -H "Authorization: Bearer ${triggerData.bearerToken}" -H "Content-Type: application/json" -d '{"name": "John", "email": "john@example.com"}'`, "curl-bearer");
-                    if (success) alert("cURL command copied!");
-                  }}
-                >
-                  Copy
-                </Button>
-              </div>
-            )}
-            {authMethod === "url_token" && (
-              <div className="relative">
-                <code className="block text-[10px] font-mono bg-muted p-2 rounded break-all whitespace-pre-wrap">
-{`curl -X POST "${triggerData.webhookUrl}" \\
-  -H "Content-Type: application/json" \\
-  -d '{"name": "John", "email": "john@example.com"}'`}
-                </code>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-1 right-1 h-6 text-[10px]"
-                  onClick={async () => {
-                    const success = await copyToClipboard(`curl -X POST "${triggerData.webhookUrl}" -H "Content-Type: application/json" -d '{"name": "John", "email": "john@example.com"}'`, "curl-token");
-                    if (success) alert("cURL command copied!");
-                  }}
-                >
-                  Copy
-                </Button>
-              </div>
-            )}
-            {authMethod === "hmac" && triggerData.hmacSecret && (
-              <div className="space-y-2">
-                <p className="text-[10px]">For HMAC, you need to compute the signature in code:</p>
-                <div className="relative">
-                  <code className="block text-[10px] font-mono bg-muted p-2 rounded break-all whitespace-pre-wrap">
-{`curl -X POST "${triggerData.webhookUrl}" \\
-  -H "X-Webhook-Signature: sha256=<computed_signature>" \\
-  -H "Content-Type: application/json" \\
-  -d '{"name": "John", "email": "john@example.com"}'`}
-                  </code>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -5,17 +5,9 @@ import {
   Bot,
   CreditCard,
   Phone,
-  Table2,
-  Github,
-  Cloud,
-  Zap,
-  Bell,
-  Database,
-  FileText,
   Send,
   Hash,
   Sparkles,
-  Briefcase,
 } from "lucide-react";
 import type { IntegrationCategory, IntegrationType } from "./types";
 
@@ -23,7 +15,7 @@ export const integrationCategories: IntegrationCategory[] = [
   {
     id: "messaging",
     label: "Messaging",
-    description: "Slack, Discord, Teams, and more",
+    description: "Slack, Discord, and Teams",
   },
   {
     id: "email",
@@ -33,32 +25,22 @@ export const integrationCategories: IntegrationCategory[] = [
   {
     id: "ai",
     label: "AI & LLM",
-    description: "OpenAI, Claude, and AI services",
-  },
-  {
-    id: "data",
-    label: "Data & Storage",
-    description: "Google Sheets, databases, and storage",
+    description: "OpenAI and Claude AI services",
   },
   {
     id: "payments",
     label: "Payments",
-    description: "Stripe, payment processing",
+    description: "Stripe payment processing",
   },
   {
     id: "sms",
     label: "SMS & Voice",
-    description: "Twilio, SMS notifications",
+    description: "Twilio SMS notifications",
   },
   {
     id: "devtools",
     label: "Developer Tools",
-    description: "GitHub, webhooks, and APIs",
-  },
-  {
-    id: "crm",
-    label: "CRM & Marketing",
-    description: "HubSpot, CRM integrations",
+    description: "Webhooks and APIs",
   },
 ];
 
@@ -313,47 +295,6 @@ export const integrationTypes: IntegrationType[] = [
     ],
   },
 
-  // Data & Storage
-  {
-    id: "google-sheets",
-    label: "Google Sheets",
-    description: "Read and write spreadsheet data",
-    icon: Table2,
-    color: "text-[#34A853]",
-    bgColor: "bg-[#34A853]/10",
-    category: "data",
-    authType: "oauth",
-    docsUrl: "https://developers.google.com/sheets/api",
-    features: ["Read rows", "Append data", "Update cells", "Create spreadsheets"],
-    fields: [], // OAuth handled separately
-  },
-  {
-    id: "google-drive",
-    label: "Google Drive",
-    description: "File storage and management",
-    icon: Cloud,
-    color: "text-[#4285F4]",
-    bgColor: "bg-[#4285F4]/10",
-    category: "data",
-    authType: "oauth",
-    docsUrl: "https://developers.google.com/drive/api",
-    features: ["Upload files", "Share files", "Organize folders", "Search"],
-    fields: [], // OAuth handled separately
-  },
-  {
-    id: "dropbox",
-    label: "Dropbox",
-    description: "Cloud file storage",
-    icon: Database,
-    color: "text-[#0061FF]",
-    bgColor: "bg-[#0061FF]/10",
-    category: "data",
-    authType: "oauth",
-    docsUrl: "https://www.dropbox.com/developers",
-    features: ["File upload", "File sharing", "Folder sync"],
-    fields: [], // OAuth handled separately
-  },
-
   // Payments
   {
     id: "stripe",
@@ -428,19 +369,6 @@ export const integrationTypes: IntegrationType[] = [
 
   // Developer Tools
   {
-    id: "github",
-    label: "GitHub",
-    description: "Repository management and automation",
-    icon: Github,
-    color: "text-black dark:text-white",
-    bgColor: "bg-black/10 dark:bg-white/10",
-    category: "devtools",
-    authType: "oauth",
-    docsUrl: "https://docs.github.com",
-    features: ["Issues", "Pull requests", "Repositories", "Actions"],
-    fields: [], // OAuth handled separately
-  },
-  {
     id: "webhook",
     label: "Custom Webhook",
     description: "Send HTTP requests to any endpoint",
@@ -482,49 +410,6 @@ export const integrationTypes: IntegrationType[] = [
     ],
   },
 
-  // CRM & Marketing
-  {
-    id: "hubspot",
-    label: "HubSpot",
-    description: "CRM and marketing automation",
-    icon: Briefcase,
-    color: "text-[#FF7A59]",
-    bgColor: "bg-[#FF7A59]/10",
-    category: "crm",
-    authType: "oauth",
-    docsUrl: "https://developers.hubspot.com",
-    features: ["Contacts", "Deals", "Companies", "Email marketing"],
-    fields: [], // OAuth handled separately
-  },
-
-  // Notifications
-  {
-    id: "push",
-    label: "Push Notifications",
-    description: "Browser and mobile push notifications",
-    icon: Bell,
-    color: "text-amber-600",
-    bgColor: "bg-amber-600/10",
-    category: "messaging",
-    authType: "api_key",
-    features: ["Browser push", "Mobile push", "Rich notifications"],
-    fields: [
-      {
-        key: "vapidPublicKey",
-        label: "VAPID Public Key",
-        type: "text",
-        placeholder: "Your VAPID public key",
-        required: true,
-      },
-      {
-        key: "vapidPrivateKey",
-        label: "VAPID Private Key",
-        type: "password",
-        placeholder: "Your VAPID private key",
-        required: true,
-      },
-    ],
-  },
 ];
 
 export const getIntegrationsByCategory = (categoryId: string): IntegrationType[] => {

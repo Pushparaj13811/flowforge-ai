@@ -80,15 +80,16 @@ Returns detailed results for each step including input/output data.`,
         testData = generateDefaultSampleData("webhook");
       }
 
-      // Execute the workflow
-      const response = await fetch(getApiUrl(`/api/workflows/${workflowId}/execute`), {
+      // Execute the workflow via the executions endpoint (synchronous - returns results inline)
+      // The /api/executions endpoint runs WorkflowRuntime directly and returns step-by-step results
+      // The /api/workflows/:id/execute endpoint queues to BullMQ (async, for webhooks/production)
+      const response = await fetch(getApiUrl(`/api/executions`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          triggerData: testData,
-          testMode: true,
-          dryRun,
+          workflowId,
+          testDataJson: JSON.stringify(testData),
         }),
       });
 
@@ -104,8 +105,11 @@ Returns detailed results for each step including input/output data.`,
         };
       }
 
+      // The /api/executions endpoint wraps results in { execution: { ... , steps: [...] } }
+      const execution = result.execution || result;
+
       // Format the results
-      const steps = (result.steps || []).map((step: any, index: number) => ({
+      const steps = (execution.steps || result.steps || []).map((step: any, index: number) => ({
         stepNumber: index + 1,
         nodeId: step.nodeId,
         nodeName: step.name || step.nodeId,
@@ -126,7 +130,7 @@ Returns detailed results for each step including input/output data.`,
       return {
         success: failedCount === 0,
         workflowId,
-        executionId: result.executionId,
+        executionId: execution.id || result.executionId,
         testDataJson: JSON.stringify(testData),
         dryRun,
         summary: {
@@ -134,7 +138,7 @@ Returns detailed results for each step including input/output data.`,
           completed: successCount,
           failed: failedCount,
           skipped: skippedCount,
-          duration: result.duration || steps.reduce((sum: number, s: any) => sum + (s.duration || 0), 0),
+          duration: execution.duration || result.duration || steps.reduce((sum: number, s: any) => sum + (s.duration || 0), 0),
         },
         steps,
         overallStatus: failedCount > 0 ? "failed" : "completed",

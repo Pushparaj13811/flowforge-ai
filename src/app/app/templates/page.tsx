@@ -1,5 +1,6 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,6 +67,20 @@ export default function TemplatesPage() {
   const handleUseTemplate = async (template: WorkflowTemplate) => {
     setIsCreating(true);
     try {
+      // Convert flat template nodes to React Flow format expected by the workflow editor
+      const reactFlowNodes = template.nodes.map((node, index) => ({
+        id: node.id,
+        type: "default",
+        position: node.position || { x: 250, y: 50 + index * 150 },
+        data: {
+          label: node.label,
+          description: node.description || "",
+          icon: node.icon || (node.type === "trigger" ? "webhook" : "mail"),
+          nodeType: node.type,
+          config: node.config || {},
+        },
+      }));
+
       // Create workflow from template
       const response = await fetch("/api/workflows", {
         method: "POST",
@@ -74,7 +89,7 @@ export default function TemplatesPage() {
           name: template.name,
           description: template.description,
           status: "draft",
-          nodes: template.nodes,
+          nodes: reactFlowNodes,
           edges: template.edges,
         }),
       });
@@ -426,3 +441,4 @@ export default function TemplatesPage() {
     </div>
   );
 }
+

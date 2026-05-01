@@ -8,7 +8,7 @@ import { db } from '@/db';
 import { workflows, executions } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { queueWorkflowExecution } from '@/lib/queue/queues';
-import { getSession } from '@/lib/auth/utils';
+import { getCurrentUser, getAnonymousId } from '@/lib/auth/utils';
 import {
   ExecuteWorkflowRequestSchema,
   ExecuteWorkflowResponseSchema,
@@ -27,9 +27,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getSession();
-    if (!session) {
+    const user = await getCurrentUser();
+    const anonymousId = await getAnonymousId();
+
+    // Must be either logged in or have anonymous ID
+    if (!user && !anonymousId) {
       return createErrorResponse('Unauthorized', 401);
     }
 
@@ -52,14 +54,18 @@ export async function POST(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    // Check ownership
-    if (workflow.userId !== session.id) {
+    // Check ownership - support both authenticated and anonymous users
+    const isOwner =
+      (user && workflow.userId === user.id) ||
+      (!user && anonymousId && workflow.anonymousId === anonymousId);
+
+    if (!isOwner) {
       return createErrorResponse('Forbidden', 403);
     }
 
-    // Check if workflow is active
-    if (workflow.status !== 'active') {
-      return createErrorResponse('Workflow must be active to execute', 400);
+    // Allow draft and active workflows to execute (paused workflows are blocked)
+    if (workflow.status === 'paused') {
+      return createErrorResponse('Workflow is paused. Resume it before executing.', 400);
     }
 
     // Create execution record
@@ -71,13 +77,13 @@ export async function POST(
       })
       .returning({ id: executions.id });
 
-    // Queue the execution
+    // Queue the execution via BullMQ
     await queueWorkflowExecution({
       workflowId,
       executionId: execution.id,
       triggerData: triggerData || {},
       triggeredBy: 'manual',
-      userId: session.id,
+      userId: user?.id || anonymousId || 'anonymous',
     });
 
     const response = ExecuteWorkflowResponseSchema.parse({

@@ -125,15 +125,23 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    // Parse trigger data
-    let triggerData = {};
+    // Parse trigger data and wrap in { data: ... } format
+    // This ensures $trigger.data.* variables resolve consistently
+    // whether triggered by webhook ({ data: body }) or inline test
+    let rawData: Record<string, unknown> = {};
     if (validatedData.testDataJson) {
       try {
-        triggerData = JSON.parse(validatedData.testDataJson);
+        rawData = JSON.parse(validatedData.testDataJson);
       } catch {
         console.warn("Failed to parse test data JSON, using empty object");
       }
     }
+
+    // If data is already wrapped (has a 'data' key with object value), use as-is
+    // Otherwise wrap it so $trigger.data.* works
+    const triggerData = (rawData.data && typeof rawData.data === 'object')
+      ? rawData
+      : { data: rawData };
 
     // Execute workflow using WorkflowRuntime
     const runtime = new WorkflowRuntime();

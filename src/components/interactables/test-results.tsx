@@ -2,7 +2,7 @@
 
 import { withInteractable } from "@tambo-ai/react";
 import { useEffect, useRef, useState } from "react";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -48,7 +48,7 @@ export const testResultsSchema = z.object({
   testDataJson: z.string().optional().describe("Test trigger data as JSON string"),
   duration: z.number().optional().describe("Total execution time in ms"),
   startedAt: z.string().optional().describe("Test start time"),
-  onRetest: z.function().returns(z.void()).optional().describe("Callback to rerun test"),
+  // Note: onRetest callback is handled internally via window events, not passed through AI
 });
 
 type TestResultsProps = z.infer<typeof testResultsSchema>;
@@ -171,9 +171,15 @@ function TestResultsBase(props: TestResultsProps) {
             {config.executionId && ` • ${config.executionId.substring(0, 8)}...`}
           </p>
         </div>
-        {config.onRetest && (
+        {config.workflowId && (
           <button
-            onClick={() => config.onRetest?.()}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('workflow-retest', {
+                  detail: { workflowId: config.workflowId, executionId: config.executionId }
+                }));
+              }
+            }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted hover:bg-muted/80 text-sm font-medium transition-colors"
           >
             <RefreshCw className="h-4 w-4" />

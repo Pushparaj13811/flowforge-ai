@@ -5,6 +5,9 @@ import { useFlowStore } from "../../store";
 import { useCopyToClipboard } from "@/hooks";
 import type { TriggerData } from "../types";
 
+// UUID validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function useWebhookTrigger(
   config: Record<string, unknown>,
   onChange: (config: Record<string, unknown>) => void
@@ -20,12 +23,23 @@ export function useWebhookTrigger(
   const workflowId = React.useMemo(() => {
     if (typeof window !== "undefined") {
       const pathParts = window.location.pathname.split("/");
-      return pathParts[pathParts.length - 1];
+      // Find UUID in path - workflow pages are /app/workflows/[uuid]
+      const workflowsIndex = pathParts.indexOf("workflows");
+      if (workflowsIndex !== -1 && pathParts[workflowsIndex + 1]) {
+        const potentialId = pathParts[workflowsIndex + 1];
+        // Validate it looks like a UUID
+        if (UUID_REGEX.test(potentialId)) {
+          return potentialId;
+        }
+      }
     }
     return null;
   }, []);
 
-  // Fetch existing webhook on mount
+  // Check if workflow is saved (has a valid UUID)
+  const isWorkflowSaved = workflowId !== null;
+
+  // Fetch existing webhook on mount - only if workflow is saved
   React.useEffect(() => {
     if (!workflowId || !selectedNode) return;
 
@@ -48,12 +62,12 @@ export function useWebhookTrigger(
               webhookToken: trigger.webhookToken,
               bearerToken: trigger.bearerToken,
               hmacSecret: trigger.hmacSecret,
-              authMethod: trigger.authMethod || "url_token",
+              authMethod: trigger.authMethod || "bearer",
             });
             onChange({
               ...config,
               webhookUrl: trigger.webhookUrl,
-              authMethod: trigger.authMethod || "url_token",
+              authMethod: trigger.authMethod || "bearer",
             });
           }
         }
@@ -66,7 +80,13 @@ export function useWebhookTrigger(
   }, [workflowId, selectedNode?.id]);
 
   const handleGenerateWebhook = async () => {
-    if (!workflowId || !selectedNode) return;
+    if (!selectedNode) return;
+
+    // If workflow is not saved, show error message
+    if (!isWorkflowSaved) {
+      alert("Please save the workflow first before generating a webhook URL. The workflow needs to be saved to the database to create a webhook endpoint.");
+      return;
+    }
 
     setIsGenerating(true);
     try {
@@ -137,14 +157,13 @@ export function useWebhookTrigger(
 
   const getAuthToken = () => {
     if (!triggerData) return null;
-    const authMethod = (config.authMethod as string) || "url_token";
+    const authMethod = (config.authMethod as string) || "bearer";
     switch (authMethod) {
-      case "bearer":
-        return triggerData.bearerToken;
       case "hmac":
         return triggerData.hmacSecret;
+      case "bearer":
       default:
-        return triggerData.webhookToken;
+        return triggerData.bearerToken;
     }
   };
 
@@ -161,6 +180,7 @@ export function useWebhookTrigger(
   return {
     isGenerating,
     triggerData,
+    isWorkflowSaved,
     handleGenerateWebhook,
     handleAuthMethodChange,
     handleCopyWebhook,

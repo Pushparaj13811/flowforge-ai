@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { webhookTriggers, workflows } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { getSession } from '@/lib/auth/utils';
+import { getCurrentUser, getAnonymousId } from '@/lib/auth/utils';
 import {
   generateWebhookToken,
   generateWebhookUrl,
@@ -22,6 +22,13 @@ import {
 
 export const dynamic = 'force-dynamic';
 
+// UUID validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(id: string): boolean {
+  return UUID_REGEX.test(id);
+}
+
 /**
  * POST /api/workflows/:id/triggers
  * Create a new webhook trigger for a workflow node
@@ -31,13 +38,19 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getSession();
-    if (!session) {
+    const user = await getCurrentUser();
+    const anonymousId = await getAnonymousId();
+
+    if (!user && !anonymousId) {
       return createErrorResponse('Unauthorized', 401);
     }
 
     const { id: workflowId } = await params;
+
+    // Validate UUID format
+    if (!isValidUUID(workflowId)) {
+      return createErrorResponse('Invalid workflow ID format', 400);
+    }
 
     // Parse and validate request body
     const result = await parseRequestBody(req, CreateTriggerRequestSchema);
@@ -56,7 +69,11 @@ export async function POST(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    const isOwner =
+      (user && workflow.userId === user.id) ||
+      (!user && anonymousId && workflow.anonymousId === anonymousId);
+
+    if (!isOwner) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -105,7 +122,7 @@ export async function POST(
         webhookToken: urlToken,
         bearerToken,
         hmacSecret,
-        authMethod: 'url_token', // Default auth method
+        authMethod: 'bearer', // Default to bearer token (most secure + simple)
         config,
         isActive: true,
       })
@@ -147,13 +164,19 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getSession();
-    if (!session) {
+    const user = await getCurrentUser();
+    const anonymousId = await getAnonymousId();
+
+    if (!user && !anonymousId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: workflowId } = await params;
+
+    // Validate UUID format
+    if (!isValidUUID(workflowId)) {
+      return createErrorResponse('Invalid workflow ID format', 400);
+    }
 
     // Verify workflow ownership
     const workflow = await db.query.workflows.findFirst({
@@ -164,7 +187,11 @@ export async function GET(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    const isOwner =
+      (user && workflow.userId === user.id) ||
+      (!user && anonymousId && workflow.anonymousId === anonymousId);
+
+    if (!isOwner) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -211,13 +238,20 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getSession();
-    if (!session) {
+    const user = await getCurrentUser();
+    const anonymousId = await getAnonymousId();
+
+    if (!user && !anonymousId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: workflowId } = await params;
+
+    // Validate UUID format
+    if (!isValidUUID(workflowId)) {
+      return createErrorResponse('Invalid workflow ID format', 400);
+    }
+
     const { searchParams } = new URL(req.url);
     const nodeId = searchParams.get('nodeId');
 
@@ -237,7 +271,11 @@ export async function DELETE(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    const isOwner =
+      (user && workflow.userId === user.id) ||
+      (!user && anonymousId && workflow.anonymousId === anonymousId);
+
+    if (!isOwner) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -275,13 +313,20 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Get session
-    const session = await getSession();
-    if (!session) {
+    const user = await getCurrentUser();
+    const anonymousId = await getAnonymousId();
+
+    if (!user && !anonymousId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id: workflowId } = await params;
+
+    // Validate UUID format
+    if (!isValidUUID(workflowId)) {
+      return createErrorResponse('Invalid workflow ID format', 400);
+    }
+
     const body = await req.json();
     const { nodeId, authMethod, regenerateTokens } = body;
 
@@ -301,7 +346,11 @@ export async function PATCH(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    const isOwner =
+      (user && workflow.userId === user.id) ||
+      (!user && anonymousId && workflow.anonymousId === anonymousId);
+
+    if (!isOwner) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -322,8 +371,8 @@ export async function PATCH(
       updatedAt: new Date(),
     };
 
-    // Update auth method if provided
-    if (authMethod && ['url_token', 'bearer', 'hmac'].includes(authMethod)) {
+    // Update auth method if provided (only bearer and hmac allowed)
+    if (authMethod && ['bearer', 'hmac'].includes(authMethod)) {
       updateData.authMethod = authMethod;
     }
 
