@@ -1,50 +1,38 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Added by code-review-graph
+.code-review-graph/
+
+# macOS
+.DS_Store
+
+# env files
+.env
+.env.local
+.env.production.local
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
+node_modules/
 
 # next.js
-/.next/
-/out/
+.next/
+next-env.d.ts
+tsconfig.tsbuildinfo
 
-# production
-/build
+# logs / locks
+bun.lock
+
+# tool configs
+.claude/
+.kiro/
+.mcp.json
+.opencode.json
+.windsurfrules
+.cursorrules
 
 # misc
-.DS_Store
-*.pem
+diagrams/
+ecosystem.config.js
+nginx.conf
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-#claude
-.claude/
-
-# cursor
-.cursor/
-
-# agents
-.agents/
+# optional docs
+AGENTS.md
+GEMINI.md
