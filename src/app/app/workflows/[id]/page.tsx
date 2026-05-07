@@ -16,7 +16,6 @@ import { VersionTimeline } from "@/components/flow-editor/VersionTimeline";
 import { ExportImportModal } from "@/components/flow-editor/ExportImportModal";
 import { SearchModal } from "@/components/flow-editor/SearchModal";
 import { TestDataModal } from "@/components/flow-editor/TestDataModal";
-import { ReactFlowProvider } from "@xyflow/react";
 import { TamboProvider } from "@tambo-ai/react";
 import { components, tools } from "@/lib/tambo";
 import { ConversationProvider } from "@/lib/conversation";
@@ -121,8 +120,7 @@ export default function WorkflowEditorPage() {
         components={components}
         tools={tools}
       >
-        <ReactFlowProvider>
-          <div className="h-screen flex flex-col bg-[#fafbfc] dark:bg-background">
+        <div className="h-screen flex flex-col bg-[#fafbfc] dark:bg-background">
             <WorkflowHeader
               workflow={workflow}
               workflowId={workflowId}
@@ -261,7 +259,6 @@ export default function WorkflowEditorPage() {
               onExecute={handleExecuteWithData}
             />
           </div>
-        </ReactFlowProvider>
       </TamboProvider>
     </ConversationProvider>
   );
