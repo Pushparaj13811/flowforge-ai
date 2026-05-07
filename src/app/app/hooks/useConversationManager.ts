@@ -43,7 +43,6 @@ export function useConversationManager() {
 
   // Handle conversation selection
   const handleSelectConversation = React.useCallback(async (id: string) => {
-    setActiveConversationId(id);
     setIsHistoryOpen(false);
     setLoadingConversation(true);
 
@@ -56,6 +55,8 @@ export function useConversationManager() {
 
       const data = await response.json();
 
+      setActiveConversationId(id);
+
       if (data.conversation.tamboThreadId) {
         switchCurrentThread(data.conversation.tamboThreadId, true);
       } else {
@@ -65,7 +66,7 @@ export function useConversationManager() {
       }
     } catch (error) {
       console.error("Failed to load conversation:", error);
-      alert("Failed to load conversation. Please try again.");
+      console.error("Failed to load conversation. Please try again.");
       startNewThread();
     } finally {
       setLoadingConversation(false);
@@ -91,7 +92,7 @@ export function useConversationManager() {
       }
     } catch (error) {
       console.error("Failed to delete conversation:", error);
-      alert("Failed to delete conversation");
+      console.error("Failed to delete conversation");
     }
   }, [activeConversationId]);
 
