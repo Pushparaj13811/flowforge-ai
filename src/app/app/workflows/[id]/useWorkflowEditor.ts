@@ -164,7 +164,7 @@ export function useWorkflowEditor({ workflowId }: UseWorkflowEditorOptions) {
 
   // Auto-save workflow with debouncing
   React.useEffect(() => {
-    if (!workflow || nodes.length === 0) return;
+    if (!workflow) return;
 
     const timeoutId = setTimeout(() => {
       console.log("[WorkflowEditor] Auto-saving workflow...");
