@@ -14,16 +14,6 @@ export interface ConsolidatedMessage {
  */
 export function getMessageText(content: unknown): string {
   if (typeof content === "string") {
-    // Filter out raw JSON strings (tool responses)
-    const trimmed = content.trim();
-    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-      try {
-        JSON.parse(trimmed);
-        return ""; // It's valid JSON, don't display it
-      } catch {
-        return content; // Not valid JSON, display it
-      }
-    }
     return content;
   }
   if (Array.isArray(content)) {
@@ -35,20 +25,7 @@ export function getMessageText(content: unknown): string {
           "type" in part &&
           part.type === "text"
       )
-      .map((part) => {
-        const text = part.text || "";
-        // Filter out JSON text parts
-        const trimmed = text.trim();
-        if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-          try {
-            JSON.parse(trimmed);
-            return ""; // It's valid JSON, don't display it
-          } catch {
-            return text;
-          }
-        }
-        return text;
-      })
+      .map((part) => part.text || "")
       .filter(Boolean)
       .join("");
   }
@@ -100,7 +77,7 @@ export function consolidateMessages(messages: Array<{
       }
 
       // Accumulate text content (avoid duplicates)
-      if (textContent && !currentAssistantMessage.textContent.includes(textContent)) {
+      if (textContent && currentAssistantMessage.textContent !== textContent) {
         if (currentAssistantMessage.textContent) {
           currentAssistantMessage.textContent += "\n\n" + textContent;
         } else {
