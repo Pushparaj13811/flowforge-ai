@@ -6,6 +6,7 @@
 "use client";
 
 import * as React from "react";
+import { useConversationContext } from "./ConversationProvider";
 
 interface UseConversationReturn {
   conversationId: string | null;
@@ -23,7 +24,7 @@ interface UseConversationReturn {
 }
 
 export function useConversation(): UseConversationReturn {
-  const [conversationId, setConversationId] = React.useState<string | null>(null);
+  const { conversationId, setConversationId } = useConversationContext();
 
   const startConversation = React.useCallback(
     async (workflowId: string, title: string): Promise<string> => {
@@ -55,7 +56,7 @@ export function useConversation(): UseConversationReturn {
         throw error;
       }
     },
-    []
+    [setConversationId]
   );
 
   const addMessage = React.useCallback(

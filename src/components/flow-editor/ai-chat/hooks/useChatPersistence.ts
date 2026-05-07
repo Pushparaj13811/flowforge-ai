@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { TamboThreadMessage } from "@tambo-ai/react";
 import { useConversation } from "@/lib/conversation";
+import { useConversationContext } from "@/lib/conversation/ConversationProvider";
 import { useFlowStore } from "../../store";
 import type { WorkflowNode, WorkflowEdge } from "../../types";
 import { detectWorkflowChanges } from "@/lib/utils/workflow-diff";
@@ -23,6 +24,7 @@ export function useChatPersistence({
   messages,
 }: UseChatPersistenceOptions) {
   const { nodes, edges, setConversation } = useFlowStore();
+  const { setConversationId } = useConversationContext();
   const {
     conversationId,
     startConversation,
@@ -58,6 +60,7 @@ export function useChatPersistence({
           if (data.conversations && data.conversations.length > 0) {
             // Use the most recent existing conversation
             const existingConv = data.conversations[0];
+            setConversationId(existingConv.id);
             setConversation(existingConv.id);
             initializedWorkflowRef.current = workflowId;
             return;
@@ -76,7 +79,7 @@ export function useChatPersistence({
     if (workflowId && !conversationId) {
       initConversation();
     }
-  }, [workflowId, workflowName, conversationId, startConversation, setConversation]);
+  }, [workflowId, workflowName, conversationId, startConversation, setConversation, setConversationId]);
 
   // Persist Tambo messages to database (debounced)
   React.useEffect(() => {
