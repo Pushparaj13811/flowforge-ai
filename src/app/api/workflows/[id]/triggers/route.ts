@@ -56,7 +56,7 @@ export async function POST(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -164,7 +164,7 @@ export async function GET(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -237,7 +237,7 @@ export async function DELETE(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -301,7 +301,7 @@ export async function PATCH(
       return createErrorResponse('Workflow not found', 404);
     }
 
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return createErrorResponse('Forbidden', 403);
     }
 

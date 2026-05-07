@@ -47,7 +47,7 @@ export async function GET(
     }
 
     // Check ownership
-    if (execution.workflow.userId !== session.id) {
+    if (execution.workflow.userId !== session.userId) {
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }

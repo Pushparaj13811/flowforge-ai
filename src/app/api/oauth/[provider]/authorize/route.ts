@@ -54,7 +54,7 @@ export async function GET(
       `oauth:state:${state}`,
       600, // 10 minutes
       JSON.stringify({
-        userId: session.id,
+        userId: session.userId,
         providerId,
         timestamp: Date.now(),
       })

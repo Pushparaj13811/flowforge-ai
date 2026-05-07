@@ -48,3 +48,5 @@ next-env.d.ts
 
 # agents
 .agents/
+# Added by code-review-graph
+.code-review-graph/
