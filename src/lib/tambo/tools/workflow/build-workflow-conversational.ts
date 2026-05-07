@@ -90,13 +90,14 @@ function extractConfigValues(intent: string): {
   }
 
   // Extract conditions (e.g., "if amount is over $100", "when order exceeds $50")
-  const conditionPatterns = [
-    /(?:if|when)\s+(\w+)\s+(?:is\s+)?(?:over|greater than|more than|above|exceeds?)\s+\$?([\d,]+)/gi,
-    /(?:if|when)\s+(\w+)\s+(?:is\s+)?(?:under|less than|below)\s+\$?([\d,]+)/gi,
-    /(?:if|when)\s+(\w+)\s+(?:equals?|is)\s+["']?([^"'\s]+)["']?/gi,
+  const conditionPatternStrings = [
+    "(?:if|when)\\s+(\\w+)\\s+(?:is\\s+)?(?:over|greater than|more than|above|exceeds?)\\s+\\$?([\\d,]+)",
+    "(?:if|when)\\s+(\\w+)\\s+(?:is\\s+)?(?:under|less than|below)\\s+\\$?([\\d,]+)",
+    "(?:if|when)\\s+(\\w+)\\s+(?:equals?|is)\\s+[\"']?([^\"'\\s]+)[\"']?",
   ];
 
-  conditionPatterns.forEach((pattern, idx) => {
+  conditionPatternStrings.forEach((patternStr, idx) => {
+    const pattern = new RegExp(patternStr, "gi");
     let match;
     while ((match = pattern.exec(intent)) !== null) {
       const field = match[1];
@@ -547,8 +548,12 @@ Example flow:
         amountsFound: parsedIntent.extractedValues.amounts.map((a) => a.value),
         conditionExtracted: parsedIntent.conditionConfig ? true : false,
         totalFieldsExtracted: nodeConfigs.reduce((sum, n) => {
-          const config = JSON.parse(n.extractedConfigJson);
-          return sum + Object.keys(config).length;
+          try {
+            const config = JSON.parse(n.extractedConfigJson);
+            return sum + Object.keys(config).length;
+          } catch {
+            return sum;
+          }
         }, 0),
       },
     };
