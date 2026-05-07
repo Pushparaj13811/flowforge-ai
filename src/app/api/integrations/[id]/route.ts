@@ -191,7 +191,7 @@ export async function DELETE(
       );
     }
 
-    await db.delete(integrations).where(eq(integrations.id, id));
+    await db.delete(integrations).where(and(eq(integrations.id, id), eq(integrations.userId, user.id)));
 
     return NextResponse.json({ message: "Integration deleted successfully" });
   } catch (error) {
