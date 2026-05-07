@@ -40,7 +40,7 @@ export async function GET(
       );
     }
 
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

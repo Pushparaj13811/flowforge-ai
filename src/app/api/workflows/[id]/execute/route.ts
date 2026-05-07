@@ -53,7 +53,7 @@ export async function POST(
     }
 
     // Check ownership
-    if (workflow.userId !== session.id) {
+    if (workflow.userId !== session.userId) {
       return createErrorResponse('Forbidden', 403);
     }
 
@@ -77,7 +77,7 @@ export async function POST(
       executionId: execution.id,
       triggerData: triggerData || {},
       triggeredBy: 'manual',
-      userId: session.id,
+      userId: session.userId,
     });
 
     const response = ExecuteWorkflowResponseSchema.parse({

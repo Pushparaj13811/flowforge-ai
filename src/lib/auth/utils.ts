@@ -180,10 +180,14 @@ export async function linkAnonymousWorkflows(userId: string): Promise<number> {
     })
     .where(eq(workflows.anonymousId, anonymousId));
 
-  // Clear the anonymous ID cookie after linking
-  await clearAnonymousIdCookie();
+  const linkedCount = result.rowCount ?? 0;
 
-  return result.rowCount ?? 0;
+  // Only clear the anonymous ID cookie when the DB update actually affected rows
+  if (linkedCount > 0) {
+    await clearAnonymousIdCookie();
+  }
+
+  return linkedCount;
 }
 
 /**
@@ -221,6 +225,6 @@ export async function getCurrentSession() {
 }
 
 /**
- * Alias for getCurrentUser (for backwards compatibility)
+ * Alias for getCurrentSession (for backwards compatibility)
  */
-export const getSession = getCurrentUser;
+export const getSession = getCurrentSession;
