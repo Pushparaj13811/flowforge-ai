@@ -201,7 +201,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
     const newNode: WorkflowNode = {
       ...node,
-      id: `${node.id}-copy-${Date.now()}`,
+      id: crypto.randomUUID(),
       position: {
         x: node.position.x + 50,
         y: node.position.y + 50,
@@ -237,7 +237,7 @@ export const useFlowStore = create<FlowState>((set, get) => ({
 
     const newNodes = state.clipboard.map((node) => ({
       ...node,
-      id: `${node.id}-paste-${Date.now()}`,
+      id: crypto.randomUUID(),
       position: {
         x: node.position.x + 100,
         y: node.position.y + 100,
