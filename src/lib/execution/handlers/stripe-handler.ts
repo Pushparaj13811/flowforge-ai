@@ -50,11 +50,12 @@ export class StripeCreatePaymentIntentHandler extends BaseNodeHandler {
         throw new Error('Amount must be greater than 0');
       }
 
-      // Get Stripe credentials
-      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Stripe credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get Stripe credentials
+      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       // Initialize Stripe
       const stripe = new Stripe(credentials.apiKey, {
@@ -150,10 +151,11 @@ export class StripeCreateCustomerHandler extends BaseNodeHandler {
         throw new Error('Email is required');
       }
 
-      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Stripe credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
         apiVersion: '2026-01-28.clover',
@@ -245,10 +247,11 @@ export class StripeCreateSubscriptionHandler extends BaseNodeHandler {
         throw new Error('Price ID is required');
       }
 
-      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Stripe credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
         apiVersion: '2026-01-28.clover',
@@ -336,10 +339,11 @@ export class StripeRefundHandler extends BaseNodeHandler {
         throw new Error('Payment Intent ID is required');
       }
 
-      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Stripe credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
         apiVersion: '2026-01-28.clover',
@@ -423,10 +427,11 @@ export class StripeGetCustomerHandler extends BaseNodeHandler {
         throw new Error('Customer ID is required');
       }
 
-      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Stripe credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
         apiVersion: '2026-01-28.clover',

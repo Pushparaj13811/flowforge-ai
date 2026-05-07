@@ -5,7 +5,7 @@
 
 import { db } from '@/db';
 import { integrations } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { encryptCredentialJSON, decryptCredentialJSON, getVault } from './credential-vault';
 import type { IntegrationConfig } from '@/types/workflow';
 
@@ -45,14 +45,15 @@ export async function storeIntegrationCredentials(params: {
  * Retrieve and decrypt integration credentials
  */
 export async function getIntegrationCredentials<T extends IntegrationConfig = IntegrationConfig>(
-  integrationId: string
-): Promise<T | null> {
+  integrationId: string,
+  userId: string
+): Promise<T> {
   const integration = await db.query.integrations.findFirst({
-    where: eq(integrations.id, integrationId),
+    where: and(eq(integrations.id, integrationId), eq(integrations.userId, userId)),
   });
 
   if (!integration) {
-    return null;
+    throw new Error('Integration not found or access denied');
   }
 
   if (!integration.isActive) {
@@ -74,6 +75,7 @@ export async function getIntegrationCredentials<T extends IntegrationConfig = In
  */
 export async function updateIntegrationCredentials(
   integrationId: string,
+  userId: string,
   config: IntegrationConfig
 ): Promise<void> {
   const encryptedConfig = encryptCredentialJSON(config);
@@ -86,7 +88,7 @@ export async function updateIntegrationCredentials(
       keyVersion,
       updatedAt: new Date(),
     })
-    .where(eq(integrations.id, integrationId));
+    .where(and(eq(integrations.id, integrationId), eq(integrations.userId, userId)));
 
   console.log(`Updated encrypted credentials for integration: ${integrationId}`);
 }
@@ -94,10 +96,15 @@ export async function updateIntegrationCredentials(
 /**
  * Delete integration
  */
-export async function deleteIntegration(integrationId: string): Promise<void> {
-  await db
+export async function deleteIntegration(integrationId: string, userId: string): Promise<void> {
+  const result = await db
     .delete(integrations)
-    .where(eq(integrations.id, integrationId));
+    .where(and(eq(integrations.id, integrationId), eq(integrations.userId, userId)))
+    .returning({ id: integrations.id });
+
+  if (result.length === 0) {
+    throw new Error('Integration not found or access denied');
+  }
 
   console.log(`Deleted integration: ${integrationId}`);
 }

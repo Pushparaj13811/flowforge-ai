@@ -52,11 +52,12 @@ export class TwilioSendSMSHandler extends BaseNodeHandler {
         throw new Error('Phone number must be in E.164 format (e.g., +15555551234)');
       }
 
-      // Get Twilio credentials
-      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Twilio credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get Twilio credentials
+      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId, context.userId);
 
       // Initialize Twilio client
       const client = twilio(credentials.accountSid, credentials.authToken);
@@ -177,10 +178,11 @@ export class TwilioSendMMSHandler extends BaseNodeHandler {
         throw new Error('Phone number must be in E.164 format');
       }
 
-      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Twilio credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId, context.userId);
 
       const client = twilio(credentials.accountSid, credentials.authToken);
 
@@ -269,10 +271,11 @@ export class TwilioLookupHandler extends BaseNodeHandler {
         throw new Error('Phone number is required');
       }
 
-      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Twilio credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<TwilioIntegrationConfig>(integrationId, context.userId);
 
       const client = twilio(credentials.accountSid, credentials.authToken);
 

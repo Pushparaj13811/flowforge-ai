@@ -51,11 +51,12 @@ export class OpenAIChatHandler extends BaseNodeHandler {
         throw new Error('Integration ID is required');
       }
 
-      // Get OpenAI credentials
-      const credentials = await getIntegrationCredentials<OpenAIConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('OpenAI credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get OpenAI credentials
+      const credentials = await getIntegrationCredentials<OpenAIConfig>(integrationId, context.userId);
 
       // Initialize OpenAI client
       const openai = new OpenAI({
@@ -188,10 +189,11 @@ export class OpenAIEmbeddingsHandler extends BaseNodeHandler {
         throw new Error('Input text is required');
       }
 
-      const credentials = await getIntegrationCredentials<OpenAIConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('OpenAI credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      const credentials = await getIntegrationCredentials<OpenAIConfig>(integrationId, context.userId);
 
       const openai = new OpenAI({
         apiKey: credentials.apiKey,

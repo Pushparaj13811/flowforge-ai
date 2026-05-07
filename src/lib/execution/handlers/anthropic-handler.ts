@@ -45,11 +45,12 @@ export class AnthropicClaudeHandler extends BaseNodeHandler {
         throw new Error('Integration ID is required');
       }
 
-      // Get Anthropic credentials
-      const credentials = await getIntegrationCredentials<AnthropicIntegrationConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Anthropic credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get Anthropic credentials
+      const credentials = await getIntegrationCredentials<AnthropicIntegrationConfig>(integrationId, context.userId);
 
       // Initialize Anthropic client
       const anthropic = new Anthropic({

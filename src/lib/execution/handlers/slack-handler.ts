@@ -47,11 +47,12 @@ export class SlackSendMessageHandler extends BaseNodeHandler {
         throw new Error('Message or blocks are required');
       }
 
-      // Get credentials
-      const credentials = await getIntegrationCredentials<SlackIntegrationConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('Integration credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get credentials
+      const credentials = await getIntegrationCredentials<SlackIntegrationConfig>(integrationId, context.userId);
 
       // Send message to Slack with retry logic
       const result = await withRetry(

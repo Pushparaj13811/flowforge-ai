@@ -121,7 +121,7 @@ export async function PATCH(
     }
     if (validatedData.config !== undefined) {
       // Get existing config, merge with new values, and re-encrypt
-      const existingConfig = await getIntegrationCredentials(id);
+      const existingConfig = await getIntegrationCredentials(id, user.id);
       const mergedConfig = {
         ...existingConfig,
         ...validatedData.config,

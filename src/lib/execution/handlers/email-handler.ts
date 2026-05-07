@@ -76,11 +76,12 @@ export class SMTPEmailHandler extends BaseNodeHandler {
         throw new Error('Email body (text or html) is required');
       }
 
-      // Get SMTP credentials
-      const credentials = await getIntegrationCredentials<SMTPConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('SMTP credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get SMTP credentials
+      const credentials = await getIntegrationCredentials<SMTPConfig>(integrationId, context.userId);
 
       // Send email with retry
       const result = await withRetry(
@@ -195,11 +196,12 @@ export class SendGridEmailHandler extends BaseNodeHandler {
         throw new Error('Subject or template ID is required');
       }
 
-      // Get SendGrid credentials
-      const credentials = await getIntegrationCredentials<SendGridConfig>(integrationId);
-      if (!credentials) {
-        throw new Error('SendGrid credentials not found');
+      if (!context.userId) {
+        throw new Error('User ID is required to access integration credentials');
       }
+
+      // Get SendGrid credentials
+      const credentials = await getIntegrationCredentials<SendGridConfig>(integrationId, context.userId);
 
       // Set API key
       sgMail.setApiKey(credentials.apiKey);

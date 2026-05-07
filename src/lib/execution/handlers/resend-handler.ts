@@ -81,11 +81,10 @@ export class ResendEmailHandler extends BaseNodeHandler {
       // HYBRID LOGIC: User credentials OR platform credentials
       if (integrationId) {
         // User provided their own integration
-        const userCredentials = await getIntegrationCredentials<ResendConfig>(integrationId);
-        if (!userCredentials) {
-          throw new Error('Email integration credentials not found');
+        if (!context.userId) {
+          throw new Error('User ID is required to access integration credentials');
         }
-        credentials = userCredentials;
+        credentials = await getIntegrationCredentials<ResendConfig>(integrationId, context.userId);
         source = 'user';
       } else {
         // Check if platform has credentials configured
