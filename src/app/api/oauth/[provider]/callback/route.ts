@@ -32,7 +32,7 @@ export async function GET(
     if (error) {
       const errorDescription = searchParams.get('error_description') || error;
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations?error=${encodeURIComponent(errorDescription)}`
+        `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations&error=${encodeURIComponent(errorDescription)}`
       );
     }
 
@@ -111,7 +111,7 @@ export async function GET(
       );
 
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations?error=token_exchange_failed`
+        `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations&error=token_exchange_failed`
       );
     }
 
@@ -139,13 +139,13 @@ export async function GET(
 
     // Redirect to integrations page with success
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations?success=true&provider=${providerId}&integrationId=${integrationId}`
+      `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations&success=true&provider=${providerId}&integrationId=${integrationId}`
     );
   } catch (error) {
     workflowLogger.error({ error }, 'OAuth callback error');
 
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations?error=callback_failed`
+      `${process.env.NEXT_PUBLIC_APP_URL}/app/settings?section=integrations&error=callback_failed`
     );
   }
 }
