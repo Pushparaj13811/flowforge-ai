@@ -50,6 +50,10 @@ export default function ExecutionHistoryPage() {
         const workflowResponse = await fetch(`/api/workflows/${workflowId}`, {
           credentials: "include",
         });
+        if (!workflowResponse.ok) {
+          console.error(`Failed to fetch workflow: HTTP ${workflowResponse.status}`);
+          return;
+        }
         const workflowData = await workflowResponse.json();
         setWorkflowName(workflowData.workflow?.name || "Unknown Workflow");
 
@@ -60,6 +64,10 @@ export default function ExecutionHistoryPage() {
             credentials: "include",
           }
         );
+        if (!executionsResponse.ok) {
+          console.error(`Failed to fetch executions: HTTP ${executionsResponse.status}`);
+          return;
+        }
         const executionsData = await executionsResponse.json();
         setExecutions(executionsData.executions || []);
       } catch (error) {

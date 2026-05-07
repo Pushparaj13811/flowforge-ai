@@ -63,32 +63,49 @@ export default function ExecutionDetailPage() {
   const [expandedSteps, setExpandedSteps] = React.useState<Set<string>>(new Set());
 
   React.useEffect(() => {
+    let cancelled = false;
+
     async function fetchExecution() {
       try {
         const response = await fetch(`/api/executions/${executionId}`, {
           credentials: "include",
         });
+        if (!response.ok) {
+          console.error(`Failed to fetch execution: HTTP ${response.status}`);
+          return;
+        }
         const data = await response.json();
-        setExecution(data.execution);
-        setSteps(data.steps || []);
+        if (!cancelled) {
+          setExecution(data.execution);
+          setSteps(data.steps || []);
+        }
       } catch (error) {
         console.error("Failed to fetch execution:", error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
     fetchExecution();
 
-    // Poll for updates if execution is running
+    // Poll for updates if execution is still in progress
     const interval = setInterval(() => {
-      if (execution?.status === "running" || execution?.status === "pending") {
-        fetchExecution();
-      }
+      if (cancelled) return;
+      setExecution((current) => {
+        if (current?.status === "running" || current?.status === "pending") {
+          fetchExecution();
+        }
+        return current;
+      });
     }, 2000);
 
-    return () => clearInterval(interval);
-  }, [executionId, execution?.status]);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [executionId]);
 
   const toggleStepExpansion = (stepId: string) => {
     setExpandedSteps((prev) => {
