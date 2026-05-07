@@ -132,7 +132,7 @@ export async function PATCH(
     const [updatedIntegration] = await db
       .update(integrations)
       .set(updateData)
-      .where(eq(integrations.id, id))
+      .where(and(eq(integrations.id, id), eq(integrations.userId, user.id)))
       .returning({
         id: integrations.id,
         type: integrations.type,

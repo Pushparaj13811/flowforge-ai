@@ -132,9 +132,9 @@ export async function listUserIntegrations(userId: string) {
 /**
  * Update last used timestamp
  */
-export async function touchIntegration(integrationId: string): Promise<void> {
+export async function touchIntegration(integrationId: string, userId: string): Promise<void> {
   await db
     .update(integrations)
     .set({ lastUsedAt: new Date() })
-    .where(eq(integrations.id, integrationId));
+    .where(and(eq(integrations.id, integrationId), eq(integrations.userId, userId)));
 }
