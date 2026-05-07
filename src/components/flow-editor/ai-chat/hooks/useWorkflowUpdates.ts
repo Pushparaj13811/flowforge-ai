@@ -54,14 +54,10 @@ export function useWorkflowUpdates({ messages }: UseWorkflowUpdatesOptions) {
                 // Batch state updates together
                 setNodes(flowNodes);
                 setEdges(flowEdges);
+                saveToHistory();
 
-                // Save to history and reset flag after state updates
-                queueMicrotask(() => {
-                  saveToHistory();
-                  setTimeout(() => {
-                    isApplyingUpdateRef.current = false;
-                  }, 100);
-                });
+                // Reset flag synchronously after state updates complete
+                isApplyingUpdateRef.current = false;
 
                 return;
               }
