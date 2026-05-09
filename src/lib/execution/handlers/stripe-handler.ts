@@ -59,7 +59,7 @@ export class StripeCreatePaymentIntentHandler extends BaseNodeHandler {
 
       // Initialize Stripe
       const stripe = new Stripe(credentials.apiKey, {
-        apiVersion: '2026-01-28.clover',
+        apiVersion: '2026-02-25.clover',
       });
 
       // Create payment intent with retry
@@ -158,7 +158,7 @@ export class StripeCreateCustomerHandler extends BaseNodeHandler {
       const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
-        apiVersion: '2026-01-28.clover',
+        apiVersion: '2026-02-25.clover',
       });
 
       const result = await withRetry(
@@ -254,7 +254,7 @@ export class StripeCreateSubscriptionHandler extends BaseNodeHandler {
       const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
-        apiVersion: '2026-01-28.clover',
+        apiVersion: '2026-02-25.clover',
       });
 
       const result = await withRetry(
@@ -346,7 +346,7 @@ export class StripeRefundHandler extends BaseNodeHandler {
       const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
-        apiVersion: '2026-01-28.clover',
+        apiVersion: '2026-02-25.clover',
       });
 
       const result = await withRetry(
@@ -434,7 +434,7 @@ export class StripeGetCustomerHandler extends BaseNodeHandler {
       const credentials = await getIntegrationCredentials<StripeConfig>(integrationId, context.userId);
 
       const stripe = new Stripe(credentials.apiKey, {
-        apiVersion: '2026-01-28.clover',
+        apiVersion: '2026-02-25.clover',
       });
 
       const result = await withRetry(
