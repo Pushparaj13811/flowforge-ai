@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRedisHealth } from '@/lib/queue/redis';
 import { getQueueHealth } from '@/lib/queue/queues';
+import { Pool } from 'pg';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,8 +22,19 @@ export async function GET(req: NextRequest) {
     // Check queue status
     const queueHealth = await getQueueHealth();
 
-    // Check database (basic check - can be enhanced)
-    const dbHealthy = true; // TODO: Add actual database health check
+    // Check database — connect and run a trivial query
+    let dbHealthy = false;
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    try {
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+      dbHealthy = true;
+    } catch {
+      dbHealthy = false;
+    } finally {
+      await pool.end().catch(() => {});
+    }
 
     const healthy = redisHealthy && queueHealth.healthy && dbHealthy;
 

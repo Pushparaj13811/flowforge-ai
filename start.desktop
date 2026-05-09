@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FlowForge AI
+GenericName=AI Workflow Builder
+Comment=Start FlowForge AI — opens PostgreSQL, Redis, Next.js server, and browser automatically
+Icon=flowforge-ai
+Path=/Users/hompushparajmehta/Pushparaj/github/Learning/flowforge-ai
+Terminal=false
+StartupNotify=true
+Categories=Development;WebDevelopment;
+Keywords=flowforge;ai;workflow;automation;nextjs;
+Exec=bash -c 'PROJECT="/Users/hompushparajmehta/Pushparaj/github/Learning/flowforge-ai"; SCRIPT="${PROJECT}/start.sh"; CMD="bash -c \"${SCRIPT}; echo; echo Press Enter to close...; read\""; for term in gnome-terminal xterm konsole xfce4-terminal lxterminal mate-terminal tilix; do if command -v "$term" >/dev/null 2>&1; then case "$term" in gnome-terminal) gnome-terminal --working-directory="${PROJECT}" -- bash -c "${SCRIPT}; echo; echo Press Enter to close...; read" & ;; *) "$term" -e "bash -c \"${SCRIPT}; echo; echo Press Enter to close...; read\"" & ;; esac; break; fi; done'
