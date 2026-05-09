@@ -361,14 +361,17 @@ log_ok "Application is healthy!"
 # ---------------------------------------------------------------------------
 log_section "Opening browser"
 
-if command -v xdg-open &>/dev/null; then
+if command -v firefox &>/dev/null; then
+    firefox "${APP_URL}" &>/dev/null &
+    log_ok "Opened ${APP_URL} in Mozilla Firefox."
+elif command -v xdg-open &>/dev/null; then
     xdg-open "${APP_URL}" &>/dev/null &
     log_ok "Opened ${APP_URL} in your default browser."
 elif command -v sensible-browser &>/dev/null; then
     sensible-browser "${APP_URL}" &>/dev/null &
     log_ok "Opened ${APP_URL} via sensible-browser."
 else
-    log_warn "Could not auto-open browser. Navigate to: ${APP_URL}"
+    log_warn "Firefox not found. Navigate to: ${APP_URL}"
 fi
 
 # ---------------------------------------------------------------------------
